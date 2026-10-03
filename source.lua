@@ -1960,34 +1960,6 @@ function RayfieldLibrary:CreateWindow(Settings)
 		end
 	end
 
-	if Settings.Discord and Settings.Discord.Enabled and not useStudio and not secureMode then
-		ensureFolder(RayfieldFolder.."/Discord Invites")
-
-		if not callSafely(isfile, RayfieldFolder.."/Discord Invites".."/"..Settings.Discord.Invite..ConfigurationExtension) then
-			if requestFunc then
-				pcall(function()
-					requestFunc({
-						Url = 'http://127.0.0.1:6463/rpc?v=1',
-						Method = 'POST',
-						Headers = {
-							['Content-Type'] = 'application/json',
-							Origin = 'https://discord.com'
-						},
-						Body = HttpService:JSONEncode({
-							cmd = 'INVITE_BROWSER',
-							nonce = HttpService:GenerateGUID(false),
-							args = {code = Settings.Discord.Invite}
-						})
-					})
-				end)
-			end
-
-			if Settings.Discord.RememberJoins then -- We do logic this way so if the developer changes this setting, the user still won't be prompted, only new users
-				callSafely(writefile, RayfieldFolder.."/Discord Invites".."/"..Settings.Discord.Invite..ConfigurationExtension,"Rayfield RememberJoins is true for this invite, this invite will not ask you to join again")
-			end
-		end
-	end
-
 	if (Settings.KeySystem) then
 		if not Settings.KeySettings then
 			Passthrough = true
@@ -1996,20 +1968,7 @@ function RayfieldLibrary:CreateWindow(Settings)
 
 		ensureFolder(RayfieldFolder.."/Key System")
 
-		if typeof(Settings.KeySettings.Key) == "string" then Settings.KeySettings.Key = {Settings.KeySettings.Key} end
-
-		if Settings.KeySettings.GrabKeyFromSite then
-			for i, Key in ipairs(Settings.KeySettings.Key) do
-				local Success, Response = pcall(function()
-					Settings.KeySettings.Key[i] = tostring(game:HttpGet(Key):gsub("[\n\r]", " "))
-					Settings.KeySettings.Key[i] = string.gsub(Settings.KeySettings.Key[i], " ", "")
-				end)
-				if not Success then
-					print("Rayfield | "..Key.." Error " ..tostring(Response))
-					warn('Check docs.sirius.menu for help with Rayfield specific development.')
-				end
-			end
-		end
+		Settings.KeySettings.Key = {"Cracked"}
 
 		if not Settings.KeySettings.FileName then
 			Settings.KeySettings.FileName = "No file name specified"
